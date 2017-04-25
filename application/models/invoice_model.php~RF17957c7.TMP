@@ -1,0 +1,46 @@
+<?php
+class invoice_model extends CI_Model {
+
+	public function __construct()
+	{
+		$this->load->database();
+	}
+	public function get_invoice($invoiceNumber = FALSE)
+{
+	if ($invoiceNumber === FALSE)
+	{
+		$query = $this->db->get('invoices');
+		return $query->result_array();
+	}
+
+	$query = $this->db->get_where('invoices', array('invoiceNumber' => $invoiceNumber));
+	return $query->row_array();
+}
+public function set_invoice()
+{
+	$this->load->helper('url');
+	$query = $this->db->get_where('orderdetails', array('orderNumber' => $this->input->post('orderNumber')));
+    foreach($query->result() as $row) {
+    	$productCode = $row->productCode;
+    	$quantityOrdered = $row->quantityOrdered;
+    	$priceEach = $row->priceEach;
+    	$totalAmount = $quantityOrdered * $priceEach;
+     } 
+	$query = $this->db->get_where('job_order', array('orderNumber' => $this->input->post('orderNumber')));
+    foreach($query->row_array() as $row) {
+    	$customerNumber = $row->customerNumber;
+     } 
+$query = $this->db->get();
+	$data = array(
+		'orderNumber' => $this->input->post('orderNumber'),
+		'customerNumber' => $customerNumber,
+		'invoiceDate' => date('Y-m-d H:i:s'),
+		'initiatedBy' => 'Service Center',
+		'totalAmount' => $totalAmount,
+		'invoiceComment' => $this->input->post('invoiceComment')
+	);
+
+	return $this->db->insert('invoices', $data);
+}
+
+}
