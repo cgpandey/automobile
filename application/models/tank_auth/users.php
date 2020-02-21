@@ -255,7 +255,7 @@ class Users extends CI_Model
 		$this->db->set('new_password_requested', NULL);
 		$this->db->where('id', $user_id);
 		$this->db->where('new_password_key', $new_pass_key);
-		$this->db->where('UNIX_TIMESTAMP(new_password_requested) >=', time() - $expire_period);
+		//$this->db->where('UNIX_TIMESTAMP(new_password_requested) >=', time() - $expire_period);
 
 		$this->db->update($this->table_name);
 		return $this->db->affected_rows() > 0;

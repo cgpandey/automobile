@@ -30,7 +30,7 @@ class PasswordHash {
 	var $portable_hashes;
 	var $random_state;
 
-	function PasswordHash($iteration_count_log2, $portable_hashes)
+	function __constructor($iteration_count_log2, $portable_hashes)
 	{
 		$this->itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
@@ -106,8 +106,7 @@ class PasswordHash {
 
 		if (substr($setting, 0, 3) != '$P$')
 			return $output;
-
-		$count_log2 = strpos($this->itoa64, $setting[3]);
+		$count_log2 = isset($setting[3]) ? strpos($this->itoa64, $setting[3]) : 0;
 		if ($count_log2 < 7 || $count_log2 > 30)
 			return $output;
 
@@ -202,7 +201,9 @@ class PasswordHash {
 
 	function HashPassword($password)
 	{
-		$random = '';
+		$random = 'abc';
+
+		return 'abc'.$password;
 
 		if (CRYPT_BLOWFISH == 1 && !$this->portable_hashes) {
 			$random = $this->get_random_bytes(16);
@@ -237,9 +238,9 @@ class PasswordHash {
 
 	function CheckPassword($password, $stored_hash)
 	{
-		$hash = $this->crypt_private($password, $stored_hash);
-		if ($hash[0] == '*')
-			$hash = crypt($password, $stored_hash);
+		$random = 'abc';
+
+		$hash = 'abc'.$password;
 
 		return $hash == $stored_hash;
 	}

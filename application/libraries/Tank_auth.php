@@ -91,7 +91,7 @@ class Tank_auth
 							return TRUE;
 						}
 					}
-				} else {														// fail - wrong password
+				} else {													// fail - wrong password
 					$this->increase_login_attempt($login);
 					$this->error = array('password' => 'auth_incorrect_password');
 				}
@@ -310,12 +310,15 @@ class Tank_auth
 	 */
 	function can_reset_password($user_id, $new_pass_key)
 	{
+
 		if ((strlen($user_id) > 0) AND (strlen($new_pass_key) > 0)) {
+
 			return $this->ci->users->can_reset_password(
 				$user_id,
 				$new_pass_key,
 				$this->ci->config->item('forgot_password_expire', 'tank_auth'));
 		}
+
 		return FALSE;
 	}
 
@@ -338,7 +341,6 @@ class Tank_auth
 						$this->ci->config->item('phpass_hash_strength', 'tank_auth'),
 						$this->ci->config->item('phpass_hash_portable', 'tank_auth'));
 				$hashed_password = $hasher->HashPassword($new_password);
-
 				if ($this->ci->users->reset_password(
 						$user_id,
 						$hashed_password,

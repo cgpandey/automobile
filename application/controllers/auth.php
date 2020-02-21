@@ -32,10 +32,11 @@ class Auth extends CI_Controller
 	 */
 	function login()
 	{
-		if ($this->tank_auth->is_logged_in()) {									// logged in
+		if ($this->tank_auth->is_logged_in()) {		
+			// logged in
 			redirect('');
 
-		} elseif ($this->tank_auth->is_logged_in(FALSE)) {						// logged in, not activated
+		} elseif ($this->tank_auth->is_logged_in(FALSE)) {			// logged in, not activated
 			redirect('/auth/send_again/');
 
 		} else {
@@ -88,7 +89,7 @@ class Auth extends CI_Controller
 			}
 			$data['show_captcha'] = FALSE;
 			if ($this->tank_auth->is_max_login_attempts_exceeded($login)) {
-				$data['show_captcha'] = TRUE;
+				$data['show_captcha'] = FALSE;
 				if ($data['use_recaptcha']) {
 					$data['recaptcha_html'] = $this->_create_recaptcha();
 				} else {
@@ -282,8 +283,7 @@ class Auth extends CI_Controller
 					$data['site_name'] = $this->config->item('website_name', 'tank_auth');
 
 					// Send email with password activation link
-					$this->_send_email('forgot_password', $data['email'], $data);
-
+					$this->_send_email('forgot_password', $data['email'], $data, TRUE);
 					$this->_show_message($this->lang->line('auth_message_new_password_sent'));
 
 				} else {
@@ -324,7 +324,9 @@ class Auth extends CI_Controller
 
 				$this->_show_message($this->lang->line('auth_message_new_password_activated').' '.anchor('/auth/login/', 'Login'));
 
-			} else {														// fail
+			} else {			
+				// fail
+				echo "Reset Password Failed"; 
 				$this->_show_message($this->lang->line('auth_message_new_password_failed'));
 			}
 		} else {
@@ -333,9 +335,9 @@ class Auth extends CI_Controller
 				$this->tank_auth->activate_user($user_id, $new_pass_key, FALSE);
 			}
 
-			if (!$this->tank_auth->can_reset_password($user_id, $new_pass_key)) {
+			/*if (!$this->tank_auth->can_reset_password($user_id, $new_pass_key)) {
 				$this->_show_message($this->lang->line('auth_message_new_password_failed'));
-			}
+			} */
 		}
 		$this->load->view('auth/reset_password_form', $data);
 	}
@@ -487,7 +489,8 @@ class Auth extends CI_Controller
 		$this->email->reply_to($this->config->item('webmaster_email', 'tank_auth'), $this->config->item('website_name', 'tank_auth'));
 		$this->email->to($email);
 		$this->email->subject(sprintf($this->lang->line('auth_subject_'.$type), $this->config->item('website_name', 'tank_auth')));
-		$this->email->message($this->load->view('email/'.$type.'-html', $data, TRUE));
+		$email_message = $this->email->message($this->load->view('email/'.$type.'-html', $data, TRUE));
+		echo '<pre>'.print_r($email_message).'</pre>';  exit();
 		$this->email->set_alt_message($this->load->view('email/'.$type.'-txt', $data, TRUE));
 		$this->email->send();
 	}
